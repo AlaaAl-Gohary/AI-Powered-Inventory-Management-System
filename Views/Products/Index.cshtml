@@ -1,0 +1,283 @@
+@model InventoryManagementSystem.ViewModels.ProductListViewModel
+
+@{
+    ViewData["Title"] = "Products";
+    ViewData["Eyebrow"] = "Products & Categories";
+
+    var categories = ViewBag.Categories as IEnumerable<InventoryManagementSystem.Models.Category>
+                     ?? Enumerable.Empty<InventoryManagementSystem.Models.Category>();
+}
+
+@section PageActions {
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="fa-solid fa-plus"></i> Add Product
+    </a>
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        <i class="fa-solid fa-circle-check"></i> @TempData["Success"]
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        <i class="fa-solid fa-circle-exclamation"></i> @TempData["Error"]
+    </div>
+}
+
+<div class="stat-row">
+    <div class="stat-card">
+        <div class="stat-label">Total Products</div>
+        <div class="stat-value num">@Model.TotalCount</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-label">Showing</div>
+        <div class="stat-value num">
+            @Model.Products.Count() of @Model.TotalCount
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-label">Page</div>
+        <div class="stat-value num">
+            @Model.PageNumber / @(Math.Max(Model.TotalPages, 1))
+        </div>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="panel-header">
+        <h2>Product Directory</h2>
+
+        <form method="get" class="search-bar">
+
+            <input type="text"
+                   name="search"
+                   value="@Model.SearchTerm"
+                   class="form-control"
+                   placeholder="Search by product name or SKU…" />
+
+            <select name="categoryId" class="form-control">
+                <option value="">All Categories</option>
+
+                @foreach (var category in categories)
+                {
+                    <option value="@category.CategoryID"
+                            selected="@(Model.CategoryId == category.CategoryID)">
+                        @category.CategoryName
+                    </option>
+                }
+            </select>
+
+            <select name="status" class="form-control">
+                <option value="">All Status</option>
+
+                <option value="In Stock"
+                        selected="@(Model.Status == "In Stock")">
+                    In Stock
+                </option>
+
+                <option value="Low Stock"
+                        selected="@(Model.Status == "Low Stock")">
+                    Low Stock
+                </option>
+
+                <option value="Out of Stock"
+                        selected="@(Model.Status == "Out of Stock")">
+                    Out of Stock
+                </option>
+            </select>
+
+            <button type="submit" class="btn btn-outline-secondary">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+
+            @if (!string.IsNullOrWhiteSpace(Model.SearchTerm)
+                || Model.CategoryId.HasValue
+                || !string.IsNullOrWhiteSpace(Model.Status))
+            {
+                <a asp-action="Index"
+                   class="btn btn-outline-secondary">
+                    Clear
+                </a>
+            }
+
+        </form>
+    </div>
+
+    @if (Model.Products.Any())
+    {
+        <div class="table-responsive">
+            <table class="data-table product-table">
+
+                <thead>
+                    <tr>
+                        <th class="row-index">#</th>
+                        <th>SKU</th>
+                        <th>Product</th>
+                        <th>Category</th>
+                        <th>Unit Price</th>
+                        <th>Stock</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @{
+                        int i = (Model.PageNumber - 1) * Model.PageSize;
+                    }
+
+                    @foreach (var product in Model.Products)
+                    {
+                        i++;
+
+                        string productStatus;
+
+                        if (product.StockQuantity == 0)
+                        {
+                            productStatus = "Out of Stock";
+                        }
+                        else if (product.StockQuantity <= product.LowStockThreshold)
+                        {
+                            productStatus = "Low Stock";
+                        }
+                        else
+                        {
+                            productStatus = "In Stock";
+                        }
+
+                        <tr>
+
+                            <td class="row-index num">
+                                @i
+                            </td>
+
+                            <td class="num">
+                                @product.SKU
+                            </td>
+
+                            <td>
+                                <strong>@product.ProductName</strong>
+                            </td>
+
+                            <td>
+                                @product.Category?.CategoryName
+                            </td>
+
+                            <td class="num">
+                                @product.UnitPrice.ToString("0.00")
+                            </td>
+
+                            <td class="num">
+                                @product.StockQuantity
+                            </td>
+
+                            <td>
+                                @if (productStatus == "In Stock")
+                                {
+                                    <span class="badge-status ok">
+                                        @productStatus
+                                    </span>
+                                }
+                                else if (productStatus == "Low Stock")
+                                {
+                                    <span class="badge-status low">
+                                        @productStatus
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge-status out">
+                                        @productStatus
+                                    </span>
+                                }
+                            </td>
+
+                            <td class="actions-cell">
+
+                                <div class="table-actions">
+
+                                    <a asp-action="Details"
+                                       asp-route-id="@product.ProductID"
+                                       class="btn btn-sm btn-info">
+                                        Details
+                                    </a>
+
+                                    <a asp-action="Edit"
+                                       asp-route-id="@product.ProductID"
+                                       class="btn btn-sm btn-warning">
+                                        Edit
+                                    </a>
+
+                                    <a asp-action="Delete"
+                                       asp-route-id="@product.ProductID"
+                                       class="btn btn-sm btn-danger">
+                                        Delete
+                                    </a>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+
+            <i class="fa-solid fa-box-open"></i>
+
+            <div class="empty-title">
+                No products found
+            </div>
+
+            <p>
+                @(string.IsNullOrWhiteSpace(Model.SearchTerm)
+                    && !Model.CategoryId.HasValue
+                    && string.IsNullOrWhiteSpace(Model.Status)
+                    ? "Add your first product to start managing inventory."
+                    : "No products match the selected filters.")
+            </p>
+
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="fa-solid fa-plus"></i> Add Product
+            </a>
+
+        </div>
+    }
+</div>
+
+@if (Model.TotalPages > 1)
+{
+    <ul class="pagination">
+
+        @for (int p = 1; p <= Model.TotalPages; p++)
+        {
+            <li class="page-item @(p == Model.PageNumber ? "active" : "")">
+
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="@p"
+                   asp-route-search="@Model.SearchTerm"
+                   asp-route-categoryId="@Model.CategoryId"
+                   asp-route-status="@Model.Status">
+                    @p
+                </a>
+
+            </li>
+        }
+
+    </ul>
+}
