@@ -1,0 +1,53 @@
+﻿@model InventoryManagementSystem.Models.Purchase
+@{
+    ViewData["Title"] = $"Purchase #{Model.PurchaseID}";
+    ViewData["Eyebrow"] = "Suppliers & Purchases · Receipt";
+}
+
+<div class="panel" style="max-width:820px;">
+    <div class="panel-header">
+        <h2>Purchase #@Model.PurchaseID</h2>
+        <span class="badge-status ok"><i class="fa-solid fa-circle-check"></i> Recorded</span>
+    </div>
+    <div class="panel-body">
+        <dl class="row" style="margin:0 0 20px 0;">
+            <dt class="col-sm-2" style="color:var(--color-text-muted); font-weight:500; padding:6px 0;">Supplier</dt>
+            <dd class="col-sm-10" style="padding:6px 0;"><strong>@Model.Supplier?.SupplierName</strong></dd>
+
+            <dt class="col-sm-2" style="color:var(--color-text-muted); font-weight:500; padding:6px 0;">Date</dt>
+            <dd class="col-sm-10 num" style="padding:6px 0;">@Model.PurchaseDate.ToShortDateString()</dd>
+        </dl>
+
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>SKU</th>
+                    <th class="text-end">Quantity</th>
+                    <th class="text-end">Unit Cost</th>
+                    <th class="text-end">Line Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.PurchaseItems)
+                {
+                    <tr>
+                        <td><strong>@item.Product?.ProductName</strong></td>
+                        <td class="num">@item.Product?.SKU</td>
+                        <td class="text-end num">@item.Quantity</td>
+                        <td class="text-end num">@item.UnitCost.ToString("C")</td>
+                        <td class="text-end num">@item.LineTotal.ToString("C")</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="4" class="text-end">Total Amount</td>
+                    <td class="text-end num grand-total">@Model.TotalAmount.ToString("C")</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+<p style="margin-top:18px;"><a asp-action="Index" class="btn btn-outline-secondary"><i class="fa-solid fa-arrow-left"></i> Back to History</a></p>

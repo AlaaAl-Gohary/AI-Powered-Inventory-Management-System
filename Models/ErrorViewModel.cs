@@ -1,4 +1,6 @@
-namespace Inventory_Management_System.Models
+using System.Collections.Generic;
+
+namespace InventoryManagementSystem.Models
 {
     public class ErrorViewModel
     {

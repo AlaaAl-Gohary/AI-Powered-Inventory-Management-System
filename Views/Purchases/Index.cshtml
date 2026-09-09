@@ -1,0 +1,79 @@
+﻿@model IEnumerable<InventoryManagementSystem.Models.Purchase>
+@{
+    ViewData["Title"] = "Purchase History";
+    ViewData["Eyebrow"] = "Suppliers & Purchases";
+    int page = ViewBag.PageNumber;
+    int totalPages = ViewBag.TotalPages;
+}
+
+@section PageActions {
+    <a asp-action="Create" class="btn btn-primary"><i class="fa-solid fa-plus"></i> New Purchase</a>
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success"><i class="fa-solid fa-circle-check"></i> @TempData["Success"]</div>
+}
+
+<div class="stat-row">
+    <div class="stat-card">
+        <div class="stat-label">Total Purchases</div>
+        <div class="stat-value num">@Model.Count()</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Total Value (this page)</div>
+        <div class="stat-value num">@Model.Sum(p => p.TotalAmount).ToString("C")</div>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="panel-header"><h2>Purchase History</h2></div>
+
+    @if (Model.Any())
+    {
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Purchase #</th>
+                    <th>Supplier</th>
+                    <th>Date</th>
+                    <th class="text-end">Total Amount</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var p in Model)
+                {
+                    <tr>
+                        <td class="num">#@p.PurchaseID</td>
+                        <td><strong>@p.Supplier?.SupplierName</strong></td>
+                        <td class="num">@p.PurchaseDate.ToShortDateString()</td>
+                        <td class="text-end num">@p.TotalAmount.ToString("C")</td>
+                        <td class="text-end"><a asp-action="Details" asp-route-id="@p.PurchaseID" class="btn btn-sm btn-info">Details</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="empty-state">
+            <i class="fa-solid fa-cart-shopping"></i>
+            <div class="empty-title">No purchases recorded yet</div>
+            <p>Create your first purchase to bring stock into the system.</p>
+            <a asp-action="Create" class="btn btn-primary"><i class="fa-solid fa-plus"></i> New Purchase</a>
+        </div>
+    }
+</div>
+
+@if (totalPages > 1)
+{
+    <ul class="pagination">
+        @for (int p = 1; p <= totalPages; p++)
+        {
+            <li class="page-item @(p == page ? "active" : "")">
+                <a class="page-link" asp-action="Index" asp-route-page="@p">@p</a>
+            </li>
+        }
+    </ul>
+}

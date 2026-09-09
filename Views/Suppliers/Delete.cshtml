@@ -1,0 +1,33 @@
+﻿@model InventoryManagementSystem.Models.Supplier
+@{
+    ViewData["Title"] = "Delete Supplier";
+    ViewData["Eyebrow"] = "Suppliers & Purchases · Delete";
+}
+
+<div class="panel" style="max-width:640px;">
+    <div class="panel-body">
+        <div class="alert alert-warning"><i class="fa-solid fa-triangle-exclamation"></i> This will permanently remove the supplier. This can't be undone.</div>
+
+        <dl class="row" style="margin:0 0 20px 0;">
+            <dt class="col-sm-3" style="color:var(--color-text-muted); font-weight:500; padding:6px 0;">Supplier Name</dt>
+            <dd class="col-sm-9" style="padding:6px 0;"><strong>@Model.SupplierName</strong></dd>
+
+            <dt class="col-sm-3" style="color:var(--color-text-muted); font-weight:500; padding:6px 0;">Contact Name</dt>
+            <dd class="col-sm-9" style="padding:6px 0;">@Model.ContactName</dd>
+
+            <dt class="col-sm-3" style="color:var(--color-text-muted); font-weight:500; padding:6px 0;">Phone</dt>
+            <dd class="col-sm-9 num" style="padding:6px 0;">@Model.Phone</dd>
+
+            <dt class="col-sm-3" style="color:var(--color-text-muted); font-weight:500; padding:6px 0;">Email</dt>
+            <dd class="col-sm-9" style="padding:6px 0;">@Model.Email</dd>
+        </dl>
+
+        <form asp-action="Delete" method="post">
+            <input type="hidden" asp-for="SupplierID" />
+            <button type="submit" class="btn btn-danger" style="background:var(--color-danger); color:#fff; border-color:var(--color-danger);">
+                <i class="fa-solid fa-trash"></i> Confirm Delete
+            </button>
+            <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+        </form>
+    </div>
+</div>

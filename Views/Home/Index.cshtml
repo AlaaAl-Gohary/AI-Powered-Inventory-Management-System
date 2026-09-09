@@ -1,8 +1,16 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Dashboard";
+    ViewData["Eyebrow"] = "Overview";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="panel">
+    <div class="empty-state">
+        <i class="fa-solid fa-gauge"></i>
+        <div class="empty-title">Dashboard coming soon</div>
+        <p>
+            This page belongs to Person 4's Dashboard &amp; Analytics feature. Once merged, it will show
+            totals, low-stock alerts, recent activity, and KPI cards here.
+        </p>
+        <a asp-controller="Suppliers" asp-action="Index" class="btn btn-primary"><i class="fa-solid fa-truck-field"></i> Go to Suppliers</a>
+    </div>
 </div>
