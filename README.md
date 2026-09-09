@@ -1,0 +1,1 @@
+An AI-powered Inventory Management System designed to help businesses efficiently manage products, categories, suppliers, purchases, sales, and stock levels. The system provides real-time inventory tracking, automated stock updates, low-stock alerts, sales and purchase analytics, and a Generative AI assistant for intelligent inventory insights and natural language queries.
