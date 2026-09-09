@@ -1,0 +1,108 @@
+﻿@model InventoryManagementSystem.ViewModels.SupplierListViewModel
+@{
+    ViewData["Title"] = "Suppliers";
+    ViewData["Eyebrow"] = "Suppliers & Purchases";
+}
+
+@section PageActions {
+    <a asp-action="Create" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Add Supplier</a>
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success"><i class="fa-solid fa-circle-check"></i> @TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger"><i class="fa-solid fa-circle-exclamation"></i> @TempData["Error"]</div>
+}
+
+<div class="stat-row">
+    <div class="stat-card">
+        <div class="stat-label">Total Suppliers</div>
+        <div class="stat-value num">@Model.TotalCount</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Showing</div>
+        <div class="stat-value num">@Model.Suppliers.Count() of @Model.TotalCount</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Page</div>
+        <div class="stat-value num">@Model.PageNumber / @(Math.Max(Model.TotalPages, 1))</div>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="panel-header">
+        <h2>Supplier Directory</h2>
+        <form method="get" class="search-bar">
+            <input type="text" name="search" value="@Model.SearchTerm" class="form-control" placeholder="Search by name, contact, email or phone…" />
+            <button type="submit" class="btn btn-outline-secondary"><i class="fa-solid fa-magnifying-glass"></i></button>
+            @if (!string.IsNullOrWhiteSpace(Model.SearchTerm))
+            {
+                <a asp-action="Index" class="btn btn-outline-secondary">Clear</a>
+            }
+        </form>
+    </div>
+
+    @if (Model.Suppliers.Any())
+    {
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th class="row-index">#</th>
+                    <th>Supplier</th>
+                    <th>Contact</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Address</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int i = (Model.PageNumber - 1) * Model.PageSize;
+                }
+                @foreach (var s in Model.Suppliers)
+                {
+                    i++;
+                    <tr>
+                        <td class="row-index num">@i</td>
+                        <td><strong>@s.SupplierName</strong></td>
+                        <td>@s.ContactName</td>
+                        <td class="num">@s.Phone</td>
+                        <td>@s.Email</td>
+                        <td>@s.Address</td>
+                        <td class="text-end">
+                            <a asp-action="Details" asp-route-id="@s.SupplierID" class="btn btn-sm btn-info">Details</a>
+                            <a asp-action="Products" asp-route-id="@s.SupplierID" class="btn btn-sm btn-secondary">Products</a>
+                            <a asp-action="Edit" asp-route-id="@s.SupplierID" class="btn btn-sm btn-warning">Edit</a>
+                            <a asp-action="Delete" asp-route-id="@s.SupplierID" class="btn btn-sm btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="empty-state">
+            <i class="fa-solid fa-truck-field"></i>
+            <div class="empty-title">No suppliers found</div>
+            <p>@(string.IsNullOrWhiteSpace(Model.SearchTerm) ? "Add your first supplier to start recording purchases." : $"Nothing matches “{Model.SearchTerm}”.")</p>
+            <a asp-action="Create" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Add Supplier</a>
+        </div>
+    }
+</div>
+
+@if (Model.TotalPages > 1)
+{
+    <ul class="pagination">
+        @for (int p = 1; p <= Model.TotalPages; p++)
+        {
+            <li class="page-item @(p == Model.PageNumber ? "active" : "")">
+                <a class="page-link" asp-action="Index" asp-route-page="@p" asp-route-search="@Model.SearchTerm">@p</a>
+            </li>
+        }
+    </ul>
+}

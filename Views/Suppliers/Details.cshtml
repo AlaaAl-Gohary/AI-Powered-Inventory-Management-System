@@ -1,0 +1,45 @@
+﻿@model InventoryManagementSystem.Models.Supplier
+@{
+    ViewData["Title"] = Model.SupplierName;
+    ViewData["Eyebrow"] = "Suppliers & Purchases · Details";
+}
+
+@section PageActions {
+    <a asp-action="Products" asp-route-id="@Model.SupplierID" class="btn btn-secondary"><i class="fa-solid fa-box"></i> Supplied Products</a>
+    <a asp-action="Edit" asp-route-id="@Model.SupplierID" class="btn btn-warning"><i class="fa-solid fa-pen"></i> Edit</a>
+}
+
+<div class="stat-row">
+    <div class="stat-card">
+        <div class="stat-label">Total Purchases</div>
+        <div class="stat-value num">@Model.Purchases.Count</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Total Spent</div>
+        <div class="stat-value num">@Model.Purchases.Sum(p => p.TotalAmount).ToString("C")</div>
+    </div>
+</div>
+
+<div class="panel" style="max-width:700px;">
+    <div class="panel-header"><h2>Contact Information</h2></div>
+    <div class="panel-body">
+        <dl class="row" style="margin:0;">
+            <dt class="col-sm-3" style="color:var(--color-text-muted); font-weight:500; padding:6px 0;">Supplier Name</dt>
+            <dd class="col-sm-9" style="padding:6px 0;"><strong>@Model.SupplierName</strong></dd>
+
+            <dt class="col-sm-3" style="color:var(--color-text-muted); font-weight:500; padding:6px 0;">Contact Name</dt>
+            <dd class="col-sm-9" style="padding:6px 0;">@Model.ContactName</dd>
+
+            <dt class="col-sm-3" style="color:var(--color-text-muted); font-weight:500; padding:6px 0;">Phone</dt>
+            <dd class="col-sm-9 num" style="padding:6px 0;">@Model.Phone</dd>
+
+            <dt class="col-sm-3" style="color:var(--color-text-muted); font-weight:500; padding:6px 0;">Email</dt>
+            <dd class="col-sm-9" style="padding:6px 0;">@Model.Email</dd>
+
+            <dt class="col-sm-3" style="color:var(--color-text-muted); font-weight:500; padding:6px 0;">Address</dt>
+            <dd class="col-sm-9" style="padding:6px 0;">@Model.Address</dd>
+        </dl>
+    </div>
+</div>
+
+<p style="margin-top:18px;"><a asp-action="Index" class="btn btn-outline-secondary"><i class="fa-solid fa-arrow-left"></i> Back to Suppliers</a></p>

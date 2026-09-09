@@ -1,0 +1,63 @@
+﻿@model IEnumerable<InventoryManagementSystem.Models.Product>
+@{
+    var supplier = ViewBag.Supplier as InventoryManagementSystem.Models.Supplier;
+    ViewData["Title"] = "Supplied Products";
+    ViewData["Eyebrow"] = $"Suppliers & Purchases · {supplier?.SupplierName}";
+}
+
+<div class="panel">
+    <div class="panel-header"><h2>Products Supplied by @supplier?.SupplierName</h2></div>
+
+    @if (Model.Any())
+    {
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>SKU</th>
+                    <th>Product Name</th>
+                    <th class="text-end">Unit Price</th>
+                    <th class="text-end">Current Stock</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var p in Model)
+                {
+                    var isOut = p.StockQuantity == 0;
+                    var isLow = !isOut && p.StockQuantity <= p.LowStockThreshold;
+                    <tr>
+                        <td class="num">@p.SKU</td>
+                        <td><strong>@p.ProductName</strong></td>
+                        <td class="text-end num">@p.UnitPrice.ToString("C")</td>
+                        <td class="text-end num">@p.StockQuantity</td>
+                        <td>
+                            @if (isOut)
+                            {
+                                <span class="badge-status out"><i class="fa-solid fa-circle-xmark"></i> Out of stock</span>
+                            }
+                            else if (isLow)
+                            {
+                                <span class="badge-status low"><i class="fa-solid fa-triangle-exclamation"></i> Low stock</span>
+                            }
+                            else
+                            {
+                                <span class="badge-status ok"><i class="fa-solid fa-circle-check"></i> In stock</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="empty-state">
+            <i class="fa-solid fa-box-open"></i>
+            <div class="empty-title">No purchase history yet</div>
+            <p>Once you record a purchase from this supplier, the products they've supplied will show up here.</p>
+            <a asp-controller="Purchases" asp-action="Create" class="btn btn-primary"><i class="fa-solid fa-plus"></i> New Purchase</a>
+        </div>
+    }
+</div>
+
+<p style="margin-top:18px;"><a asp-action="Details" asp-route-id="@supplier?.SupplierID" class="btn btn-outline-secondary"><i class="fa-solid fa-arrow-left"></i> Back to Supplier</a></p>

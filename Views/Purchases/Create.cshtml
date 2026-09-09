@@ -1,0 +1,151 @@
+﻿@model InventoryManagementSystem.ViewModels.PurchaseCreateViewModel
+@{
+    ViewData["Title"] = "New Purchase";
+    ViewData["Eyebrow"] = "Suppliers & Purchases · New";
+}
+
+<form asp-action="Create" method="post" id="purchaseForm">
+    <div asp-validation-summary="ModelOnly"></div>
+
+    <div class="panel" style="margin-bottom:20px;">
+        <div class="panel-header"><h2>Purchase Information</h2></div>
+        <div class="panel-body" style="display:flex; gap:24px; flex-wrap:wrap;">
+            <div class="field-group" style="flex:1; min-width:240px;">
+                <label asp-for="SupplierID">Supplier</label>
+                <select asp-for="SupplierID" class="form-select">
+                    <option value="">-- Select Supplier --</option>
+                    @foreach (var s in Model.SupplierOptions)
+                    {
+                        <option value="@s.Value">@s.Text</option>
+                    }
+                </select>
+                <span asp-validation-for="SupplierID" class="text-danger"></span>
+            </div>
+            <div class="field-group" style="flex:1; min-width:200px;">
+                <label asp-for="PurchaseDate">Purchase Date</label>
+                <input asp-for="PurchaseDate" type="date" class="form-control" />
+            </div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-header"><h2>Purchase Items</h2></div>
+        <div class="panel-body" style="padding:0;">
+            <table class="data-table" id="itemsTable">
+                <thead>
+                    <tr>
+                        <th style="width:38%;">Product</th>
+                        <th style="width:15%;">Quantity</th>
+                        <th style="width:18%;">Unit Cost</th>
+                        <th style="width:18%;" class="text-end">Line Total</th>
+                        <th style="width:11%;"></th>
+                    </tr>
+                </thead>
+                <tbody id="itemsBody">
+                    @for (int i = 0; i < Model.Items.Count; i++)
+                    {
+                        <tr class="item-row">
+                            <td>
+                                <select name="Items[@i].ProductID" class="form-select product-select">
+                                    <option value="">-- Select Product --</option>
+                                    @foreach (var p in Model.ProductOptions)
+                                    {
+                                        <option value="@p.Value">@p.Text</option>
+                                    }
+                                </select>
+                            </td>
+                            <td><input name="Items[@i].Quantity" type="number" min="1" value="@Model.Items[i].Quantity" class="form-control qty-input num" /></td>
+                            <td><input name="Items[@i].UnitCost" type="number" step="0.01" min="0.01" value="@Model.Items[i].UnitCost" class="form-control cost-input num" /></td>
+                            <td class="line-total text-end num">0.00</td>
+                            <td class="text-end"><button type="button" class="btn btn-sm btn-danger remove-row"><i class="fa-solid fa-xmark"></i></button></td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" class="text-end">Total</td>
+                        <td class="text-end num grand-total" id="grandTotal">0.00</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+            <div style="padding:14px 16px;">
+                <button type="button" id="addRowBtn" class="btn btn-outline-secondary"><i class="fa-solid fa-plus"></i> Add Item</button>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-top:20px;">
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Save Purchase</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        const productOptionsHtml = `@Html.Raw(string.Join("", Model.ProductOptions.Select(p => $"<option value=\"{p.Value}\">{System.Net.WebUtility.HtmlEncode(p.Text)}</option>")))`;
+
+        function formatMoney(n) {
+            return n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function recalcRow(row) {
+            const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
+            const cost = parseFloat(row.querySelector('.cost-input').value) || 0;
+            row.querySelector('.line-total').textContent = formatMoney(qty * cost);
+            recalcGrandTotal();
+        }
+
+        function recalcGrandTotal() {
+            let total = 0;
+            document.querySelectorAll('.item-row').forEach(row => {
+                const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
+                const cost = parseFloat(row.querySelector('.cost-input').value) || 0;
+                total += qty * cost;
+            });
+            document.getElementById('grandTotal').textContent = formatMoney(total);
+        }
+
+        function attachRowEvents(row) {
+            row.querySelector('.qty-input').addEventListener('input', () => recalcRow(row));
+            row.querySelector('.cost-input').addEventListener('input', () => recalcRow(row));
+            row.querySelector('.remove-row').addEventListener('click', () => {
+                if (document.querySelectorAll('.item-row').length > 1) {
+                    row.remove();
+                    reindexRows();
+                    recalcGrandTotal();
+                }
+            });
+        }
+
+        function reindexRows() {
+            document.querySelectorAll('.item-row').forEach((row, index) => {
+                row.querySelector('.product-select').name = `Items[${index}].ProductID`;
+                row.querySelector('.qty-input').name = `Items[${index}].Quantity`;
+                row.querySelector('.cost-input').name = `Items[${index}].UnitCost`;
+            });
+        }
+
+        document.getElementById('addRowBtn').addEventListener('click', () => {
+            const tbody = document.getElementById('itemsBody');
+            const index = document.querySelectorAll('.item-row').length;
+            const tr = document.createElement('tr');
+            tr.className = 'item-row';
+            tr.innerHTML = `
+                <td><select name="Items[${index}].ProductID" class="form-select product-select"><option value="">-- Select Product --</option>${productOptionsHtml}</select></td>
+                <td><input name="Items[${index}].Quantity" type="number" min="1" value="1" class="form-control qty-input num" /></td>
+                <td><input name="Items[${index}].UnitCost" type="number" step="0.01" min="0.01" value="0" class="form-control cost-input num" /></td>
+                <td class="line-total text-end num">0.00</td>
+                <td class="text-end"><button type="button" class="btn btn-sm btn-danger remove-row"><i class="fa-solid fa-xmark"></i></button></td>
+            `;
+            tbody.appendChild(tr);
+            attachRowEvents(tr);
+        });
+
+        document.querySelectorAll('.item-row').forEach(attachRowEvents);
+        recalcGrandTotal();
+    </script>
+}
