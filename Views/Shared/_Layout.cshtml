@@ -4,57 +4,135 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] — Inventory Management System</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+          rel="stylesheet">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+    <link rel="stylesheet"
+          href="~/css/site.css"
+          asp-append-version="true" />
 </head>
+
 <body>
     <div class="app-shell">
+
         <aside class="app-sidebar">
+
             <div class="brand">
                 <div class="brand-mark">IM</div>
-                <div class="brand-text">Inventory System<small>Warehouse &amp; Procurement</small></div>
+
+                <div class="brand-text">
+                    Inventory System
+                    <small>Warehouse &amp; Procurement</small>
+                </div>
             </div>
 
-            <div class="nav-section-label">SUPPLIERS &amp; PURCHASES</div>
+
+            <div class="nav-section-label">
+                SUPPLIERS &amp; PURCHASES
+            </div>
+
             <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Suppliers" ? "active" : "")"
-               asp-controller="Suppliers" asp-action="Index">
-                <i class="fa-solid fa-truck-field"></i> Suppliers
-            </a>
-            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Purchases" ? "active" : "")"
-               asp-controller="Purchases" asp-action="Index">
-                <i class="fa-solid fa-cart-shopping"></i> Purchases
+               asp-controller="Suppliers"
+               asp-action="Index">
+
+                <i class="fa-solid fa-truck-field"></i>
+                Suppliers
             </a>
 
-            <div class="nav-section-label">SYSTEM</div>
-            <a class="nav-link" asp-controller="Home" asp-action="Index">
-                <i class="fa-solid fa-gauge"></i> Dashboard
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Purchases" ? "active" : "")"
+               asp-controller="Purchases"
+               asp-action="Index">
+
+                <i class="fa-solid fa-cart-shopping"></i>
+                Purchases
             </a>
+
+
+            <div class="nav-section-label">
+                PRODUCTS &amp; CATEGORIES
+            </div>
+
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Products" ? "active" : "")"
+               asp-controller="Products"
+               asp-action="Index">
+
+                <i class="fa-solid fa-box"></i>
+                Products
+            </a>
+
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Categories" ? "active" : "")"
+               asp-controller="Categories"
+               asp-action="Index">
+
+                <i class="fa-solid fa-tags"></i>
+                Categories
+            </a>
+
+
+            <div class="nav-section-label">
+                SYSTEM
+            </div>
+
+            <a class="nav-link"
+               asp-controller="Home"
+               asp-action="Index">
+
+                <i class="fa-solid fa-gauge"></i>
+                Dashboard
+            </a>
+
         </aside>
 
+
         <div class="app-main">
+
             <header class="app-topbar">
+
                 <div>
-                    <p class="eyebrow">@ViewData["Eyebrow"]</p>
-                    <h1>@ViewData["Title"]</h1>
+                    <p class="eyebrow">
+                        @ViewData["Eyebrow"]
+                    </p>
+
+                    <h1>
+                        @ViewData["Title"]
+                    </h1>
                 </div>
-                <div>@await RenderSectionAsync("PageActions", required: false)</div>
+
+                <div>
+                    @await RenderSectionAsync("PageActions", required: false)
+                </div>
+
             </header>
+
 
             <main class="app-content">
                 @RenderBody()
             </main>
 
+
             <footer class="app-footer">
-                © @DateTime.Now.Year — Inventory Management System · Suppliers &amp; Purchases module
+                © @DateTime.Now.Year — Inventory Management System ·
+                Suppliers &amp; Purchases module
             </footer>
+
         </div>
+
     </div>
 
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/4.0.0/jquery.validate.unobtrusive.min.js"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
+
 </body>
 </html>

@@ -1,0 +1,196 @@
+@model InventoryManagementSystem.ViewModels.CategoryListViewModel
+
+@{
+    ViewData["Title"] = "Categories";
+    ViewData["Eyebrow"] = "Products & Categories";
+}
+
+@section PageActions {
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="fa-solid fa-plus"></i> Add Category
+    </a>
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        <i class="fa-solid fa-circle-check"></i> @TempData["Success"]
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        <i class="fa-solid fa-circle-exclamation"></i> @TempData["Error"]
+    </div>
+}
+
+<div class="stat-row">
+    <div class="stat-card">
+        <div class="stat-label">Total Categories</div>
+        <div class="stat-value num">@Model.TotalCount</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-label">Showing</div>
+        <div class="stat-value num">
+            @Model.Categories.Count() of @Model.TotalCount
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-label">Page</div>
+        <div class="stat-value num">
+            @Model.PageNumber / @(Math.Max(Model.TotalPages, 1))
+        </div>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="panel-header">
+        <h2>Category Directory</h2>
+
+        <form method="get" class="search-bar">
+            <input type="text"
+                   name="search"
+                   value="@Model.SearchTerm"
+                   class="form-control"
+                   placeholder="Search by category name…" />
+
+            <button type="submit" class="btn btn-outline-secondary">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+
+            @if (!string.IsNullOrWhiteSpace(Model.SearchTerm))
+            {
+                <a asp-action="Index"
+                   class="btn btn-outline-secondary">
+                    Clear
+                </a>
+            }
+        </form>
+    </div>
+
+    @if (Model.Categories.Any())
+    {
+        <div class="table-responsive">
+            <table class="data-table category-table">
+
+                <thead>
+                    <tr>
+                        <th class="row-index">#</th>
+                        <th>Category</th>
+                        <th>Description</th>
+                        <th>Products</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @{
+                        int i = (Model.PageNumber - 1) * Model.PageSize;
+                    }
+
+                    @foreach (var category in Model.Categories)
+                    {
+                        i++;
+
+                        <tr>
+                            <td class="row-index num">
+                                @i
+                            </td>
+
+                            <td>
+                                <strong>@category.CategoryName</strong>
+                            </td>
+
+                            <td>
+                                @(string.IsNullOrWhiteSpace(category.Description)
+                                    ? "—"
+                                    : category.Description)
+                            </td>
+
+                            <td class="num">
+                                @category.Products.Count
+                            </td>
+
+                            <td class="actions-cell">
+                                <div class="table-actions">
+
+                                    <a asp-action="Details"
+                                       asp-route-id="@category.CategoryID"
+                                       class="btn btn-sm btn-info">
+                                        Details
+                                    </a>
+
+                                    <a asp-action="Products"
+                                       asp-route-id="@category.CategoryID"
+                                       class="btn btn-sm btn-secondary">
+                                        Products
+                                    </a>
+
+                                    <a asp-action="Edit"
+                                       asp-route-id="@category.CategoryID"
+                                       class="btn btn-sm btn-warning">
+                                        Edit
+                                    </a>
+
+                                    <a asp-action="Delete"
+                                       asp-route-id="@category.CategoryID"
+                                       class="btn btn-sm btn-danger">
+                                        Delete
+                                    </a>
+
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+
+            <i class="fa-solid fa-layer-group"></i>
+
+            <div class="empty-title">
+                No categories found
+            </div>
+
+            <p>
+                @(string.IsNullOrWhiteSpace(Model.SearchTerm)
+                    ? "Add your first category to organize products."
+                    : $"Nothing matches “{Model.SearchTerm}”.")
+            </p>
+
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="fa-solid fa-plus"></i> Add Category
+            </a>
+
+        </div>
+    }
+</div>
+
+@if (Model.TotalPages > 1)
+{
+    <ul class="pagination">
+
+        @for (int p = 1; p <= Model.TotalPages; p++)
+        {
+            <li class="page-item @(p == Model.PageNumber ? "active" : "")">
+
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="@p"
+                   asp-route-search="@Model.SearchTerm">
+                    @p
+                </a>
+
+            </li>
+        }
+
+    </ul>
+}

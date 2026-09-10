@@ -1,0 +1,115 @@
+@model IEnumerable<InventoryManagementSystem.Models.Product>
+
+@{
+    ViewData["Title"] = "Category Products";
+    ViewData["Eyebrow"] = "Products & Categories";
+}
+
+<div class="panel">
+    <div class="panel-header">
+        <h2>Products in @ViewBag.Category.CategoryName</h2>
+    </div>
+
+    @if (Model.Any())
+    {
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th class="row-index">#</th>
+                    <th>SKU</th>
+                    <th>Product</th>
+                    <th>Unit Price</th>
+                    <th>Stock</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @{
+                    int i = 0;
+                }
+
+                @foreach (var product in Model)
+                {
+                    i++;
+
+                    <tr>
+                        <td class="row-index num">@i</td>
+
+                        <td>@product.SKU</td>
+
+                        <td>
+                            <strong>@product.ProductName</strong>
+                        </td>
+
+                        <td class="num">
+                            @product.UnitPrice
+                        </td>
+
+                        <td class="num">
+                            @product.StockQuantity
+                        </td>
+
+                        <td>
+                            @if (product.StockQuantity == 0)
+                            {
+                                <span class="badge bg-danger">Out of Stock</span>
+                            }
+                            else if (product.StockQuantity <= product.LowStockThreshold)
+                            {
+                                <span class="badge bg-warning text-dark">Low Stock</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-success">In Stock</span>
+                            }
+                        </td>
+
+                        <td class="text-end">
+                            <a asp-controller="Products"
+                               asp-action="Details"
+                               asp-route-id="@product.ProductID"
+                               class="btn btn-sm btn-info">
+                                Details
+                            </a>
+
+                            <a asp-controller="Products"
+                               asp-action="Edit"
+                               asp-route-id="@product.ProductID"
+                               class="btn btn-sm btn-warning">
+                                Edit
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="empty-state">
+            <i class="fa-solid fa-box-open"></i>
+
+            <div class="empty-title">
+                No products found
+            </div>
+
+            <p>
+                This category does not contain any products yet.
+            </p>
+
+            <a asp-controller="Products"
+               asp-action="Create"
+               class="btn btn-primary">
+                <i class="fa-solid fa-plus"></i> Add Product
+            </a>
+        </div>
+    }
+
+    <div class="mt-4">
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            Back to Categories
+        </a>
+    </div>
+</div>
