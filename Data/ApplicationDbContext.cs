@@ -21,6 +21,9 @@ namespace InventoryManagementSystem.Data
         public DbSet<Supplier> Suppliers => Set<Supplier>();
         public DbSet<Purchase> Purchases => Set<Purchase>();
         public DbSet<PurchaseItem> PurchaseItems => Set<PurchaseItem>();
+        // Person 3
+        public DbSet<Sale> Sales => Set<Sale>();
+        public DbSet<SaleItem> SaleItems => Set<SaleItem>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -52,6 +55,17 @@ namespace InventoryManagementSystem.Data
                 .HasOne(pi => pi.Product)
                 .WithMany(p => p.PurchaseItems)
                 .HasForeignKey(pi => pi.ProductID)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<SaleItem>()
+    .HasOne(si => si.Sale)
+    .WithMany(s => s.SaleItems)
+    .HasForeignKey(si => si.SaleID)
+    .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<SaleItem>()
+                .HasOne(si => si.Product)
+                .WithMany()
+                .HasForeignKey(si => si.ProductID)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Supplier>().ToTable("Suppliers");
