@@ -1,0 +1,64 @@
+﻿@{
+    ViewData["Title"] = "AI Inventory Copilot";
+}
+
+<div class="ai-wrap">
+    <div class="ai-toolbar">
+        <button type="button" class="btn btn-sm btn-outline-secondary" id="ai-briefing">ملخص تنفيذي سريع</button>
+        <span class="ai-hint">جرّب: "إيه المنتجات اللي محتاجة إعادة تخزين؟" · "إجمالي المشتريات الشهر ده؟"</span>
+    </div>
+    <div id="ai-log" class="ai-log"></div>
+    <div class="ai-input">
+        <input id="ai-q" class="form-control" placeholder="اكتب سؤالك..." autocomplete="off" />
+        <button id="ai-send" class="btn btn-primary">اسأل</button>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+(function () {
+    const log = document.getElementById('ai-log');
+    const q = document.getElementById('ai-q');
+    const send = document.getElementById('ai-send');
+    const brief = document.getElementById('ai-briefing');
+
+    function add(role, text, cls) {
+        const div = document.createElement('div');
+        div.className = 'ai-msg ' + (cls || '');
+        div.innerHTML = '<b>' + role + ':</b> ' + String(text)
+            .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+        log.appendChild(div); log.scrollTop = log.scrollHeight;
+    }
+    async function post(url, body) {
+        const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body || {}) });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+    }
+    async function ask() {
+        const question = q.value.trim(); if (!question) return;
+        add('أنت', question, 'ai-user'); q.value = ''; send.disabled = true;
+        const t = document.createElement('div'); t.className = 'ai-msg ai-bot';
+        t.innerHTML = '<b>Copilot:</b> …بفكر'; log.appendChild(t);
+        try {
+            const data = await post('@Url.Action("Ask", "AiAssistant")', { question });
+            t.remove(); add('Copilot', data.answer || '(مفيش إجابة)', 'ai-bot');
+            if (data.toolsUsed && data.toolsUsed.length)
+                add('', 'tools: ' + data.toolsUsed.join(', '), 'ai-tools');
+        } catch (e) { t.remove(); add('Copilot', 'خطأ: ' + e.message, 'ai-bot'); }
+        finally { send.disabled = false; q.focus(); }
+    }
+    send.addEventListener('click', ask);
+    q.addEventListener('keydown', e => { if (e.key === 'Enter') ask(); });
+    brief.addEventListener('click', async () => {
+        brief.disabled = true; add('أنت', 'ملخص تنفيذي', 'ai-user');
+        try {
+            const res = await fetch('@Url.Action("Insights", "AiAssistant")');
+            const data = await res.json();
+            add('Copilot', data.insight || '(مفيش)', 'ai-bot');
+        } catch (e) { add('Copilot', 'خطأ: ' + e.message, 'ai-bot'); }
+        finally { brief.disabled = false; }
+    });
+})();
+</script>
+}
