@@ -1,0 +1,64 @@
+@model InventoryManagementSystem.ViewModels.SaleCreateViewModel
+
+@{
+    ViewData["Title"] = "Create New Sale";
+    var products = ViewBag.Products;
+}
+
+<h2>Create New Sale</h2>
+<hr />
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        <ul class="mb-0">
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <li>@error.ErrorMessage</li>
+            }
+        </ul>
+    </div>
+}
+
+<form asp-action="Create" method="post" id="saleForm">
+    @Html.AntiForgeryToken()
+
+    <div class="mb-3 col-md-5">
+        <label asp-for="CustomerInfo" class="form-label"></label>
+        <input asp-for="CustomerInfo" class="form-control" placeholder="Cutomer Name / Phone Number" />
+        <span asp-validation-for="CustomerInfo" class="text-danger"></span>
+    </div>
+
+    <h5>Sale Items</h5>
+    <table class="table table-bordered align-middle" id="itemsTable">
+        <thead class="table-light">
+            <tr>
+                <th style="width:32%">product</th>
+                <th style="width:14%">Quantity</th>
+                <th style="width:14%">unit Price</th>
+                <th style="width:14%">Total</th>
+                <th style="width:14%">Available stock</th>
+                <th style="width:12%"></th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <button type="button" class="btn btn-outline-primary" id="addItemBtn">+ Add Item</button>
+
+    <div class="text-end mt-3">
+        <h4> Grand Total: <span id="grandTotal">0.00</span></h4>
+    </div>
+
+    <button type="submit" class="btn btn-success mt-2">Confirm Sale</button>
+    <a asp-action="Index" class="btn btn-secondary mt-2">Sale</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        
+        const products = @Html.Raw(Json.Serialize(products));
+    </script>
+    <script src="~/js/sales.js"></script>
+}

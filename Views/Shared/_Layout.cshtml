@@ -73,6 +73,17 @@
                 <i class="fa-solid fa-tags"></i>
                 Categories
             </a>
+            <div class="nav-section-label">
+                SALES
+            </div>
+
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Sales" ? "active" : "")"
+               asp-controller="Sales"
+               asp-action="Index">
+
+                <i class="fa-solid fa-receipt"></i>
+                Sales
+            </a>
 
 
             <div class="nav-section-label">

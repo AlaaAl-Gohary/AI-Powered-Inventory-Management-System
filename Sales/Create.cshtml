@@ -1,0 +1,65 @@
+@model InventoryManagementSystem.ViewModels.SaleCreateViewModel
+
+@{
+    ViewData["Title"] = "إنشاء عملية بيع جديدة";
+    var products = ViewBag.Products;
+}
+
+<h2>إنشاء عملية بيع جديدة</h2>
+<hr />
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        <ul class="mb-0">
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <li>@error.ErrorMessage</li>
+            }
+        </ul>
+    </div>
+}
+
+<form asp-action="Create" method="post" id="saleForm">
+    @Html.AntiForgeryToken()
+
+    <div class="mb-3 col-md-5">
+        <label asp-for="CustomerInfo" class="form-label"></label>
+        <input asp-for="CustomerInfo" class="form-control" placeholder="اسم العميل / رقم التليفون" />
+        <span asp-validation-for="CustomerInfo" class="text-danger"></span>
+    </div>
+
+    <h5>أصناف عملية البيع</h5>
+    <table class="table table-bordered align-middle" id="itemsTable">
+        <thead class="table-light">
+            <tr>
+                <th style="width:32%">المنتج</th>
+                <th style="width:14%">الكمية</th>
+                <th style="width:14%">سعر الوحدة</th>
+                <th style="width:14%">الإجمالي</th>
+                <th style="width:14%">المتاح بالمخزون</th>
+                <th style="width:12%"></th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <button type="button" class="btn btn-outline-primary" id="addItemBtn">+ إضافة صنف</button>
+
+    <div class="text-end mt-3">
+        <h4>الإجمالي الكلي: <span id="grandTotal">0.00</span></h4>
+    </div>
+
+    <button type="submit" class="btn btn-success mt-2">تأكيد عملية البيع</button>
+    <a asp-action="Index" class="btn btn-secondary mt-2">إلغاء</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // بيانات المنتجات (السعر والمخزون) جايه من السيرفر عشان الـ JS يستخدمها
+        // من غير ما يعمل طلب لكل منتج على حدة
+        const products = @Html.Raw(Json.Serialize(products));
+    </script>
+    <script src="~/js/sales.js"></script>
+}

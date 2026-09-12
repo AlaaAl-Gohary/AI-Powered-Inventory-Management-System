@@ -1,0 +1,69 @@
+@model IEnumerable<InventoryManagementSystem.Models.Sale>
+
+@{
+    ViewData["Title"] = "Sales History";
+    int currentPage = ViewBag.CurrentPage;
+    int totalPages = ViewBag.TotalPages;
+}
+
+<h2>Sales History</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <form method="get" class="d-flex">
+        <input type="text" name="search" value="@ViewBag.Search" class="form-control me-2" placeholder="Search by customer name..." />
+        <button type="submit" class="btn btn-outline-primary">بحث</button>
+    </form>
+    <a asp-action="Create" class="btn btn-success">+ New Sale</a>
+</div>
+
+@if (!Model.Any())
+{
+    <p class="text-muted">No sales have been recorded yet.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Date</th>
+                <th>customer</th>
+                <th>Items Count</th>
+                <th>Total</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var sale in Model)
+            {
+                <tr>
+                    <td>@sale.SaleID</td>
+                    <td>@sale.SaleDate.ToString("yyyy-MM-dd HH:mm")</td>
+                    <td>@sale.CustomerInfo</td>
+                    <td>@sale.SaleItems.Count</td>
+                    <td>@sale.TotalAmount.ToString("0.00")</td>
+                    <td><a asp-action="Details" asp-route-id="@sale.SaleID" class="btn btn-sm btn-info"> View Invoice</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @if (totalPages > 1)
+    {
+        <nav>
+            <ul class="pagination">
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <li class="page-item @(i == currentPage ? "active" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-page="@i" asp-route-search="@ViewBag.Search">@i</a>
+                    </li>
+                }
+            </ul> 
+        </nav>
+    }
+}
